@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const NotesList = ({ onSelectGroup }) => {
   const [showPopup, setShowPopup] = useState(false);
@@ -8,6 +8,8 @@ const NotesList = ({ onSelectGroup }) => {
   const colors = ['#B38BFA', '#FF79F2', '#43E6FC', '#F19576', '#0047FF', '#6691FF'  ];
 
   const [groups, setGroups] = useState([]);
+
+  const popupRef = useRef(null);
 
   useEffect(() => {
     const loadGroups = () => {
@@ -25,6 +27,19 @@ const NotesList = ({ onSelectGroup }) => {
     window.addEventListener('storage', loadGroups);
     return () => window.removeEventListener('storage', loadGroups);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showPopup && popupRef.current && !popupRef.current.contains(event.target)) {
+        setShowPopup(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPopup]);
 
   const getInitials = (name) => {
     return name
@@ -98,24 +113,25 @@ const NotesList = ({ onSelectGroup }) => {
       setSelectedColor('');
       
       console.log('storage changed', localStorage.getItem('group-list-pocket-note'));
-    //   window.location.reload();
+      window.location.reload();
     }
   };
 
   return (
-    <div style={{ position: 'relative', height: '100%' }}>
+    <div style={{ height: '100%', position: 'relative' }}>
       <div 
         onClick={() => setShowPopup(true)}
         style={{
           position: 'absolute',
-          bottom: '20px',
-          right: '20px',
+          bottom: '40px',
+          right: '40px',
           width: '40px',
           height: '40px',
           borderRadius: '50%',
           backgroundColor: '#16008B',
           color: 'white',
           display: 'flex',
+          padding: '5px',
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: '24px',
@@ -129,79 +145,88 @@ const NotesList = ({ onSelectGroup }) => {
       {showPopup && (
         <div style={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-          width: '500px'
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
         }}>
-          <h3 style={{textAlign: 'left'}}>Create New Group</h3>
-          <div style={{ margin: '10px', textAlign: 'left'}}>
-            <label>Group Name</label>
-            <input
-              type="text"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-              style={{ 
-                width: '100%',
-                padding: '8px',
-                marginTop: '8px',
-                border: '1px solid #ccc',
-                borderRadius: '22px',
-                display: 'inline'
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '20px', textAlign: 'left'}}>
-            <label>Choose Color</label>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-              {colors.map((color) => (
-                <div
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  style={{
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    backgroundColor: color,
-                    cursor: 'pointer',
-                    border: selectedColor === color ? '2px solid #000' : 'none'
-                  }}
-                />
-              ))}
+          <div ref={popupRef} style={{ 
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '5px',
+            width: '90%',
+            maxWidth: '500px'
+          }}>
+            <h3 style={{textAlign: 'left'}}>Create New Group</h3>
+            <div style={{ margin: '10px', textAlign: 'left'}}>
+              <label>Group Name</label>
+              <input
+                type="text"
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+                style={{ 
+                  width: '100%',
+                  padding: '8px',
+                  marginTop: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '22px',
+                  display: 'inline'
+                }}
+              />
             </div>
-          </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-            <button
-              onClick={() => setShowPopup(false)}
-              style={{
-                padding: '8px 16px',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!groupName || !selectedColor}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: groupName && selectedColor ? '#16008B' : '#ccc',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: groupName && selectedColor ? 'pointer' : 'not-allowed'
-              }}
-            >
-              Create
-            </button>
+            <div style={{ marginBottom: '20px', textAlign: 'left'}}>
+              <label>Choose Color</label>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                {colors.map((color) => (
+                  <div
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '50%',
+                      backgroundColor: color,
+                      cursor: 'pointer',
+                      border: selectedColor === color ? '2px solid #000' : 'none'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                onClick={() => setShowPopup(false)}
+                style={{
+                  padding: '8px 16px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!groupName || !selectedColor}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: groupName && selectedColor ? '#16008B' : '#ccc',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: groupName && selectedColor ? 'pointer' : 'not-allowed'
+                }}
+              >
+                Create
+              </button>
+            </div>
           </div>
         </div>
       )}

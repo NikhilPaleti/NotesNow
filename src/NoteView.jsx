@@ -5,10 +5,12 @@ const NoteView = ({ group, isMobile, onBack }) => {
   const [newNote, setNewNote] = useState('');
 
   useEffect(() => {
+    // Reset notes first when group changes
+    setNotes([]);
+    
     if (group) {
       const notesString = localStorage.getItem(`${group}-list`);
-      console.log(notesString)
-      if (notesString) {
+      if (notesString && notesString.trim() !== '') {
         const notesList = notesString.split(';').map(note => {
           let [text, ...date] = note.split(':');
           date = date.join(':');
@@ -16,14 +18,12 @@ const NoteView = ({ group, isMobile, onBack }) => {
         });
         setNotes(notesList);
       } else {
-        // Create the storage if it doesn't exist
+        // Ensure notes are empty for new/empty groups
+        setNotes([]);
         localStorage.setItem(`${group}-list`, '');
       }
-    } else {
-      // Reset notes when no group is selected
-      setNotes([]);
     }
-  }, [group]);
+  }, [group]); // Only depend on group changes
 
   const handleAddNote = () => {
     if (newNote) {
@@ -65,7 +65,7 @@ const NoteView = ({ group, isMobile, onBack }) => {
                 ←
               </button>
             )}
-            <h2 style={{ margin: 0 }}>{group} - {getInitials(group)}</h2>
+            <h2 style={{ margin: 0 }}>{group}</h2>
           </div>
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {notes.map((note, index) => (
@@ -97,8 +97,8 @@ const NoteView = ({ group, isMobile, onBack }) => {
         </>
       ) : (
         <div> 
-          <img src="/dancers.png" alt="Dancers" style={{ width: '80%', height: 'auto', marginTop: '10vh' }} />
-          {/* <img src={`${process.env.PUBLIC_URL}/dancers.png`} alt="Dancers" style={{ width: '100%', height: 'auto' }} /> */}
+          {/* <img src="/dancers.png" alt="Dancers" style={{ width: '80%', height: 'auto', marginTop: '10vh' }} /> */}
+          <img src={`${process.env.PUBLIC_URL}/dancers.png`} alt="Dancers" style={{ width: '80%', height: 'auto' }} />
           <h1> Pocket Notes </h1>
           <p>Send and receive messages without keeping your phone online. <br /> Use Pocket Notes on up to 4 linked devices and 1 mobile phone</p> 
         </div>
