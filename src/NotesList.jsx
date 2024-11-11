@@ -5,7 +5,7 @@ const NotesList = ({ onSelectGroup }) => {
   const [groupName, setGroupName] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
 
-  const colors = ['#B38BFA', '#FF79F2', '#43E6FC', '#F19576', '#0047FF'];
+  const colors = ['#B38BFA', '#FF79F2', '#43E6FC', '#F19576', '#0047FF', '#6691FF'  ];
 
   const [groups, setGroups] = useState([]);
 
@@ -124,6 +124,7 @@ const NotesList = ({ onSelectGroup }) => {
       >
         +
       </div>
+      <h1> Pocket Notes </h1>
         {renderGroups()}
       {showPopup && (
         <div style={{
@@ -135,10 +136,10 @@ const NotesList = ({ onSelectGroup }) => {
           padding: '20px',
           borderRadius: '8px',
           boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-          width: '300px'
+          width: '500px'
         }}>
-          <h3>Create New Group</h3>
-          <div style={{ marginBottom: '20px' }}>
+          <h3 style={{textAlign: 'left'}}>Create New Group</h3>
+          <div style={{ margin: '10px', textAlign: 'left'}}>
             <label>Group Name</label>
             <input
               type="text"
@@ -149,12 +150,13 @@ const NotesList = ({ onSelectGroup }) => {
                 padding: '8px',
                 marginTop: '8px',
                 border: '1px solid #ccc',
-                borderRadius: '4px'
+                borderRadius: '22px',
+                display: 'inline'
               }}
             />
           </div>
 
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: '20px', textAlign: 'left'}}>
             <label>Choose Color</label>
             <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
               {colors.map((color) => (
